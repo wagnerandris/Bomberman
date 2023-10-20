@@ -59,7 +59,7 @@
             menu.Size = new Size(512, 512);
             menu.TabIndex = 1;
             // 
-            // Bomberman
+            // GameForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -67,9 +67,10 @@
             ClientSize = new Size(512, 512);
             Controls.Add(menu);
             Controls.Add(tile_map);
+            KeyPreview = true;
             MaximumSize = new Size(528, 551);
             MinimumSize = new Size(528, 551);
-            Name = "Bomberman";
+            Name = "GameForm";
             SizeGripStyle = SizeGripStyle.Hide;
             Text = "Bomberman";
             ResumeLayout(false);

@@ -24,31 +24,9 @@ namespace Model
 
         public void Move()
         {
-            (int, int) new_pos;
+            (int, int) new_position = Position;
 
-            switch (direction)
-            {
-                case Direction.Left:
-                    new_pos = Position;
-                    new_pos.Item1 -= 1;
-                    break;
-                case Direction.Right:
-                    new_pos = Position;
-                    new_pos.Item1 += 1;
-                    break;
-                case Direction.Up:
-                    new_pos = Position;
-                    new_pos.Item2 -= 1;
-                    break;
-                case Direction.Down:
-                    new_pos = Position;
-                    new_pos.Item2 += 1;
-                    break;
-            }
-
-            //CheckPosition(new_pos);
-
-            base.Move(direction);
+            base.Move(new_position);
         }
 
     }

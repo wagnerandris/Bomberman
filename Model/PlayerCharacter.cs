@@ -8,7 +8,7 @@ namespace Model
 {
     public class PlayerCharacter : Actor
     {
-        public PlayerCharacter((int, int) player_start) : base((0, 0))
+        public PlayerCharacter((int, int) player_start) : base(player_start)
         {
         }
     }
