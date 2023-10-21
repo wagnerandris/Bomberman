@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace Model
 {
-    internal class Bomb : IGameObject
+    public class Bomb
     {
-        private readonly (int, int) position;
+        private readonly (int, int) _position;
 
-        public (int, int) Position { get => position; }
+        public (int, int) Position { get => _position; }
 
         public Bomb((int, int) pos)
         {
-            position = pos;
+            _position = pos;
             _ = new Timer(Explode(), null, 3000, Timeout.Infinite);
         }
 

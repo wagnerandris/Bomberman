@@ -1,5 +1,6 @@
 using Model;
 using Persistence;
+using System.CodeDom;
 using View.Properties;
 
 namespace View
@@ -8,16 +9,21 @@ namespace View
     {
         private Game? _game;
         private IMapReader? _mapReader;
-        private readonly Random _random = new Random();
+        private readonly Random _random = new();
         private readonly Bitmap[] _wall_images = { Resources.asteroid1, Resources.asteroid2, Resources.asteroid3 };
+
+        private bool key_held;
 
         public GameForm()
         {
             InitializeComponent();
 
             menu.Start += Menu_Start;
+            KeyDown += GameForm_KeyDown;
+            KeyUp += GameForm_KeyUp;
             Actor.ActorMoved += Actor_ActorMoved;
         }
+
 
         private void Menu_Start(object? sender, StartEventArgs e)
         {
@@ -51,6 +57,7 @@ namespace View
 
             int TileHeight = 512 / _mapReader.Map.Height;
             int TileWidth = 512 / _mapReader.Map.Width;
+
 
             for (int i = 0; i < _mapReader.Map.Width; i++)
             {
@@ -92,22 +99,36 @@ namespace View
 
         private void Actor_ActorMoved(object? sender, ActorMovedEventArgs e)
         {
+            if (sender == null) return;
+
             if (tile_map.InvokeRequired)
             {
-                tile_map.Invoke(new Action<object?, ActorMovedEventArgs>(Actor_ActorMoved), sender, e);
+                tile_map.Invoke(new Action<object, ActorMovedEventArgs>(Actor_ActorMoved), sender, e);
                 return;
             }
 
-            Control old_tile = tile_map.GetControlFromPosition(e.Old_pos.Item1, e.Old_pos.Item2);
-            tile_map.GetControlFromPosition(e.New_pos.Item1, e.New_pos.Item2).BackgroundImage = old_tile.BackgroundImage;
-            old_tile.BackgroundImage = null;
+            if (sender!.GetType() == typeof(PlayerCharacter))
+            {
+                tile_map.GetControlFromPosition(e.New_pos.Item1, e.New_pos.Item2).BackgroundImage = Resources.Slave_I;
+            } else {
+                tile_map.GetControlFromPosition(e.New_pos.Item1, e.New_pos.Item2).BackgroundImage = Resources.TIE;
+            }
+
+            tile_map.GetControlFromPosition(e.Old_pos.Item1, e.Old_pos.Item2).BackgroundImage = null;
+        }
+        private void GameForm_KeyUp(object? sender, KeyEventArgs e)
+        {
+            key_held = false;
         }
 
-
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        private void GameForm_KeyDown(object? sender, KeyEventArgs e)
         {
-            if (_game == null) return false;
-            switch (keyData)
+            if (key_held) return;
+            key_held = true;
+
+            if (_game == null) return;
+
+            switch (e.KeyCode)
             {
                 case Keys.Escape:
                     _game.StartPause();
@@ -116,21 +137,24 @@ namespace View
                     _game.PlaceBomb();
                     break;
                 case Keys.Up:
+                case Keys.W:
                     _game.MovePlayer(Direction.Up);
                     break;
                 case Keys.Down:
+                case Keys.S:
                     _game.MovePlayer(Direction.Down);
                     break;
                 case Keys.Left:
+                case Keys.A:
                     _game.MovePlayer(Direction.Left);
                     break;
                 case Keys.Right:
+                case Keys.D:
                     _game.MovePlayer(Direction.Right);
                     break;
                 default:
                     break;
             }
-            return true;
         }
     }
 }
