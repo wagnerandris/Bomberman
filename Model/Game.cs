@@ -10,6 +10,8 @@
 
         private int _destroyed_enemies = 0;
 
+        public event EventHandler<GameOverEventArgs>? GameOver;
+
         public Game(Map map, List<(int, int)> enemies_start, (int, int) player_start)
         {
             _map = map;
@@ -73,13 +75,13 @@
 
             if (sender!.GetType() == typeof(PlayerCharacter))
             {
-                // Invoke game over
+                GameOver?.Invoke(this, new GameOverEventArgs(false));
             } else {
                 _enemies.Remove((Enemy)sender);
                 _destroyed_enemies++;
                 if (_enemies.Count == 0)
                 {
-                    // Invoke game won
+                    GameOver?.Invoke(this, new GameOverEventArgs(true));
                 }
             }
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Model
+﻿namespace Model
 {
     public class PlayerCharacter : Actor
     {
@@ -17,13 +11,12 @@ namespace Model
             (int, int)? new_position = NewPosition(direction);
             if (new_position == null) return;
 
+            base.Move(((int, int))new_position);
+            
             // If the player steps on an enemy, it's game over
-            if (_enemies.All(e => e.Position != new_position))
+            if (!_enemies.All(e => e.Position != new_position))
             {
-                base.Move(((int, int))new_position);
-            } else
-            {
-                Actor.Destroyed?.Invoke(this, new ActorDestroyedEventArgs(Position));
+                InvokeDestroyed(this);
             }
         }
 

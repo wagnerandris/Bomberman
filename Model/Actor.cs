@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Model
+﻿namespace Model
 {
-
     public abstract class Actor
     {
         protected readonly Map _map;
@@ -21,7 +12,7 @@ namespace Model
         public static event EventHandler<ActorMovedEventArgs>? Moved;
         public static event EventHandler<ActorDestroyedEventArgs>? Destroyed;
 
-        public Actor((int, int) start_position, Map map, List<Enemy> enemies, List<Bomb> bombs)
+        protected Actor((int, int) start_position, Map map, List<Enemy> enemies, List<Bomb> bombs)
         {
             _position = start_position;
             _map = map;
@@ -31,7 +22,7 @@ namespace Model
             Bomb.Exploded += Bomb_Exploded;
         }
 
-        public (int, int)? NewPosition(Direction direction)
+        protected virtual (int, int)? NewPosition(Direction direction)
         {
             (int, int) new_position = Position;
             switch (direction)
@@ -71,6 +62,11 @@ namespace Model
             {
                 Destroyed?.Invoke(this, new ActorDestroyedEventArgs(_position));
             }
+        }
+
+        protected void InvokeDestroyed(Actor actor)
+        {
+            Destroyed?.Invoke(actor, new ActorDestroyedEventArgs(_position));
         }
     }
 }

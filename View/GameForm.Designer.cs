@@ -30,6 +30,10 @@
         {
             tile_map = new TableLayoutPanel();
             menu = new Menu();
+            status_strip = new StatusStrip();
+            time_label = new ToolStripStatusLabel();
+            destroyed_label = new ToolStripStatusLabel();
+            status_strip.SuspendLayout();
             SuspendLayout();
             // 
             // tile_map
@@ -55,24 +59,49 @@
             // 
             menu.BackColor = Color.Transparent;
             menu.Location = new Point(0, 0);
+            menu.Margin = new Padding(0);
             menu.Name = "menu";
             menu.Size = new Size(512, 512);
             menu.TabIndex = 1;
+            // 
+            // status_strip
+            // 
+            status_strip.Items.AddRange(new ToolStripItem[] { time_label, destroyed_label });
+            status_strip.Location = new Point(0, 512);
+            status_strip.Name = "status_strip";
+            status_strip.Size = new Size(512, 22);
+            status_strip.TabIndex = 2;
+            status_strip.Text = "statusStrip1";
+            // 
+            // time_label
+            // 
+            time_label.Name = "time_label";
+            time_label.Size = new Size(39, 17);
+            time_label.Text = "Time: ";
+            // 
+            // destroyed_label
+            // 
+            destroyed_label.Name = "destroyed_label";
+            destroyed_label.Size = new Size(112, 17);
+            destroyed_label.Text = "Enemies destroyed: ";
             // 
             // GameForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.stars_background;
-            ClientSize = new Size(512, 512);
+            ClientSize = new Size(512, 534);
+            Controls.Add(status_strip);
             Controls.Add(menu);
             Controls.Add(tile_map);
             KeyPreview = true;
-            MaximumSize = new Size(528, 551);
-            MinimumSize = new Size(528, 551);
+            MaximumSize = new Size(528, 573);
+            MinimumSize = new Size(528, 573);
             Name = "GameForm";
             SizeGripStyle = SizeGripStyle.Hide;
             Text = "Bomberman";
+            status_strip.ResumeLayout(false);
+            status_strip.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -81,5 +110,8 @@
 
         private TableLayoutPanel tile_map;
         private Menu menu;
+        private StatusStrip status_strip;
+        private ToolStripStatusLabel time_label;
+        private ToolStripStatusLabel destroyed_label;
     }
 }

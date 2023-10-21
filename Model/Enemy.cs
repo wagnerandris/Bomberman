@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 
 namespace Model
 {
@@ -12,7 +7,7 @@ namespace Model
         private Direction _direction;
         private readonly List<Direction> _tried_directions = new();
         private readonly PlayerCharacter _player;
-        
+
         private static readonly Random _random = new();
         private static readonly Array _possible_directions = Enum.GetValues(typeof(Direction));
 
@@ -23,7 +18,7 @@ namespace Model
             _direction = (Direction)_possible_directions.GetValue(_random.Next(_possible_directions.Length))!;
         }
 
-        void ChangeDirection()
+        private void ChangeDirection()
         {
             // Find new direction not already tried in this step
             _tried_directions.Add(_direction);
@@ -36,6 +31,17 @@ namespace Model
                 j++;
             }
             while (_tried_directions.Contains(_direction) && j < _possible_directions.Length);
+        }
+
+        protected override (int, int)? NewPosition(Direction direction)
+        {
+            (int, int)? new_position = base.NewPosition(direction);
+            if (new_position == null) return null;
+
+            // Enemies may not step on each other or bombs
+            if (!_enemies.All(e => e.Position != new_position) || !_bombs.All(e => e.Position != new_position)) return null;
+
+            return new_position;
         }
 
         public void Move()
@@ -64,17 +70,13 @@ namespace Model
             // it's possible that none of the four directions is available
             if (new_position == null) return;
 
-            // Enemies may not step on each other or bombs
-            if (!_enemies.All(e => e.Position != new_position) && !_bombs.All(e => e.Position != new_position)) return;
-
             base.Move(((int, int))new_position!);
 
-            // If an enemy steps on the player, it's game over
+            // If the player is stepped on it's destroyed
             if (_player.Position == new_position)
             {
-                // invoke game end event
+                InvokeDestroyed(_player);
             }
         }
-
     }
 }

@@ -1,6 +1,5 @@
 using Model;
 using Persistence;
-using System.CodeDom;
 using View.Properties;
 
 namespace View
@@ -98,6 +97,13 @@ namespace View
 
             // Init game
             _game = new Game(_mapReader.Map, _mapReader.Enemies_start, _mapReader.Player_start);
+            _game.GameOver += _game_GameOver;
+        }
+
+        private void _game_GameOver(object? sender, GameOverEventArgs e)
+        {
+            // Popup
+            throw new NotImplementedException();
         }
 
         private void Actor_Moved(object? sender, ActorMovedEventArgs e)
@@ -153,7 +159,12 @@ namespace View
 
         private void Actor_Destroyed(object? sender, ActorDestroyedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (tile_map.InvokeRequired)
+            {
+                tile_map.Invoke(new Action<object, ActorDestroyedEventArgs>(Actor_Destroyed), sender, e);
+            }
+
+            tile_map.GetControlFromPosition(e.Position.Item1, e.Position.Item2).BackgroundImage = null;
         }
 
         private void GameForm_KeyUp(object? sender, KeyEventArgs e)

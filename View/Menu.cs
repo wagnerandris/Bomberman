@@ -5,7 +5,7 @@ namespace View
     public partial class Menu : UserControl
     {
         public event EventHandler<StartEventArgs>? Start;
-        private string _mapfile = "maps/map1.txt";
+        private string _mapfile = "maps/map2.txt";
 
         public Menu()
         {

@@ -14,7 +14,7 @@
         {
             _position = pos;
             Placed?.Invoke(this, EventArgs.Empty);
-            _timer = new System.Timers.Timer(10000);
+            _timer = new System.Timers.Timer(5000);
             _timer.Elapsed += Explode;
             _timer.Start();
         }
