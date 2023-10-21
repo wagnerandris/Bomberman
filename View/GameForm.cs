@@ -21,9 +21,11 @@ namespace View
             menu.Start += Menu_Start;
             KeyDown += GameForm_KeyDown;
             KeyUp += GameForm_KeyUp;
-            Actor.ActorMoved += Actor_ActorMoved;
+            Actor.Moved += Actor_Moved;
+            Actor.Destroyed += Actor_Destroyed;
+            Bomb.Placed += Bomb_Placed;
+            Bomb.Exploded += Bomb_Exploded;
         }
-
 
         private void Menu_Start(object? sender, StartEventArgs e)
         {
@@ -65,12 +67,12 @@ namespace View
                 {
                     // Populating the map with tiles
                     tile_map.Controls.Add(new Panel()
-                        {
+                    {
                         BackgroundImageLayout = ImageLayout.Stretch,
                         Height = TileHeight,
                         Width = TileWidth,
                         Margin = new Padding(0)
-                        },
+                    },
                         i, j);
 
                     if (_mapReader.Map.Walls[i, j])
@@ -91,31 +93,69 @@ namespace View
 
             // "Switch" to game screen
             menu.Visible = false;
+            menu.Enabled = false;
             tile_map.Visible = true;
 
             // Init game
             _game = new Game(_mapReader.Map, _mapReader.Enemies_start, _mapReader.Player_start);
         }
 
-        private void Actor_ActorMoved(object? sender, ActorMovedEventArgs e)
+        private void Actor_Moved(object? sender, ActorMovedEventArgs e)
         {
+            // Bad practice:
+            // > It is better to die than to return in failure. -- Klingon proverb
+            // > If I had more time, I would have written ~a shorter letter~ better code. -- Blaise Pascal
             if (sender == null) return;
 
             if (tile_map.InvokeRequired)
             {
-                tile_map.Invoke(new Action<object, ActorMovedEventArgs>(Actor_ActorMoved), sender, e);
+                tile_map.Invoke(new Action<object, ActorMovedEventArgs>(Actor_Moved), sender, e);
                 return;
             }
 
             if (sender!.GetType() == typeof(PlayerCharacter))
             {
-                tile_map.GetControlFromPosition(e.New_pos.Item1, e.New_pos.Item2).BackgroundImage = Resources.Slave_I;
-            } else {
-                tile_map.GetControlFromPosition(e.New_pos.Item1, e.New_pos.Item2).BackgroundImage = Resources.TIE;
+                tile_map.GetControlFromPosition(((Actor)sender).Position.Item1, ((Actor)sender).Position.Item2).BackgroundImage = Resources.Slave_I;
+            }
+            else
+            {
+                tile_map.GetControlFromPosition(((Actor)sender).Position.Item1, ((Actor)sender).Position.Item2).BackgroundImage = Resources.TIE;
             }
 
             tile_map.GetControlFromPosition(e.Old_pos.Item1, e.Old_pos.Item2).BackgroundImage = null;
         }
+
+        private void Bomb_Placed(object? sender, EventArgs e)
+        {
+            if (sender == null) return;
+
+            if (tile_map.InvokeRequired)
+            {
+                tile_map.Invoke(new Action<object, EventArgs>(Bomb_Placed), sender, e);
+            }
+
+            tile_map.GetControlFromPosition(((Bomb)sender).Position.Item1, ((Bomb)sender).Position.Item2).BackgroundImage = Resources.seismic_charge;
+        }
+
+        private void Bomb_Exploded(object? sender, BombExplodedEventArgs e)
+        {
+            // TODO: Draw on background instead
+            if (sender == null) return;
+
+            if (tile_map.InvokeRequired)
+            {
+                tile_map.Invoke(new Action<object, BombExplodedEventArgs>(Bomb_Exploded), sender, e);
+            }
+
+            tile_map.GetControlFromPosition(e.Position.Item1, e.Position.Item2).BackgroundImage = null;
+            // Play explosion animation
+        }
+
+        private void Actor_Destroyed(object? sender, ActorDestroyedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         private void GameForm_KeyUp(object? sender, KeyEventArgs e)
         {
             key_held = false;

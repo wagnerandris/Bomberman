@@ -1,26 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Model
+﻿namespace Model
 {
-    public class Bomb
+    public class Bomb : IDisposable
     {
         private readonly (int, int) _position;
+        private readonly System.Timers.Timer _timer;
+
+        public static event EventHandler? Placed;
+        public static event EventHandler<BombExplodedEventArgs>? Exploded;
 
         public (int, int) Position { get => _position; }
 
         public Bomb((int, int) pos)
         {
             _position = pos;
-            _ = new Timer(Explode(), null, 3000, Timeout.Infinite);
+            Placed?.Invoke(this, EventArgs.Empty);
+            _timer = new System.Timers.Timer(10000);
+            _timer.Elapsed += Explode;
+            _timer.Start();
+        }
+        public void Dispose()
+        {
+            _timer.Dispose();
         }
 
-        private TimerCallback Explode()
+        private void Explode(object? sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Exploded?.Invoke(this, new BombExplodedEventArgs(_position));
         }
     }
 }

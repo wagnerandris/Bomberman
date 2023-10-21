@@ -27,6 +27,7 @@ namespace Persistence
             if (height == 0) throw new MapFileException("Empty mapfile");
             int width = lines[0].Length;
 
+            bool player_found = false;
             bool [,] walls = new bool[width, height];
             for (int j = 0; j < height; j++)
             {
@@ -40,6 +41,8 @@ namespace Persistence
                         case '*':
                             Enemies_start.Add((i, j)); break;
                         case '@':
+                            if (player_found) throw new MapFileException("Multiple player characters found in mapfile.");
+                            player_found = true;
                             Player_start = (i, j); break;
                         case '.':
                             break;

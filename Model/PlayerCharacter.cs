@@ -8,7 +8,7 @@ namespace Model
 {
     public class PlayerCharacter : Actor
     {
-        public PlayerCharacter((int, int) player_start, Map map, List<Enemy> enemies) : base(player_start, map, enemies)
+        public PlayerCharacter((int, int) start_position, Map map, List<Enemy> enemies, List<Bomb> bombs) : base(start_position, map, enemies, bombs)
         {
         }
 
@@ -23,8 +23,13 @@ namespace Model
                 base.Move(((int, int))new_position);
             } else
             {
-                // invoke game end event
+                Actor.Destroyed?.Invoke(this, new ActorDestroyedEventArgs(Position));
             }
+        }
+
+        internal void PlaceBomb()
+        {
+            _bombs.Add(new Bomb(Position));
         }
     }
 }

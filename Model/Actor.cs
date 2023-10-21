@@ -13,17 +13,22 @@ namespace Model
     {
         protected readonly Map _map;
         protected readonly List<Enemy> _enemies;
+        protected readonly List<Bomb> _bombs;
 
         private (int, int) _position;
         public (int, int) Position { get => _position; protected set => _position = value; }
 
-        public static event EventHandler<ActorMovedEventArgs>? ActorMoved;
+        public static event EventHandler<ActorMovedEventArgs>? Moved;
+        public static event EventHandler<ActorDestroyedEventArgs>? Destroyed;
 
-        public Actor((int, int) start_position, Map map, List<Enemy> enemies)
+        public Actor((int, int) start_position, Map map, List<Enemy> enemies, List<Bomb> bombs)
         {
             _position = start_position;
             _map = map;
             _enemies = enemies;
+            _bombs = bombs;
+
+            Bomb.Exploded += Bomb_Exploded;
         }
 
         public (int, int)? NewPosition(Direction direction)
@@ -57,7 +62,15 @@ namespace Model
         {
             (int, int) old_position = _position;
             _position = new_position;
-            ActorMoved?.Invoke(this, new ActorMovedEventArgs(old_position, new_position));
+            Moved?.Invoke(this, new ActorMovedEventArgs(old_position));
+        }
+
+        private void Bomb_Exploded(object? sender, BombExplodedEventArgs e)
+        {
+            if (Math.Abs(e.Position.Item1 - _position.Item1) < e.Radius && Math.Abs(e.Position.Item2 - _position.Item2) < e.Radius)
+            {
+                Destroyed?.Invoke(this, new ActorDestroyedEventArgs(_position));
+            }
         }
     }
 }

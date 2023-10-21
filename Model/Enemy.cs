@@ -12,15 +12,13 @@ namespace Model
         private Direction _direction;
         private readonly List<Direction> _tried_directions = new();
         private readonly PlayerCharacter _player;
-        private readonly List<Bomb> _bombs;
         
         private static readonly Random _random = new();
         private static readonly Array _possible_directions = Enum.GetValues(typeof(Direction));
 
-        public Enemy((int, int) pos, Map map, List<Enemy> enemies, PlayerCharacter player, List<Bomb> bombs) : base(pos, map, enemies)
+        public Enemy((int, int) pos, Map map, List<Enemy> enemies, PlayerCharacter player, List<Bomb> bombs) : base(pos, map, enemies, bombs)
         {
             _player = player;
-            _bombs = bombs;
 
             _direction = (Direction)_possible_directions.GetValue(_random.Next(_possible_directions.Length))!;
         }
