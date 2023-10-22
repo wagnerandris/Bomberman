@@ -6,11 +6,9 @@
         private readonly List<Enemy> _enemies;
         private readonly List<Bomb> _bombs;
         private readonly PlayerCharacter _player_character;
-        private readonly System.Timers.Timer _timer;
+        public readonly System.Timers.Timer timer;
 
-        private int _destroyed_enemies = 0;
-
-        public event EventHandler<GameOverEventArgs>? GameOver;
+        public static event EventHandler<GameOverEventArgs>? GameOver;
 
         public Game(Map map, List<(int, int)> enemies_start, (int, int) player_start)
         {
@@ -23,8 +21,9 @@
                 _enemies.Add(new Enemy(pos, _map, _enemies, _player_character, _bombs));
             }
             
-            _timer = new System.Timers.Timer(1000);
-            _timer.Elapsed += Move_Enemies;
+            timer = new System.Timers.Timer(1000);
+            timer.Elapsed += Move_Enemies;
+            timer.Start();
 
             Bomb.Exploded += Bomb_Exploded;
             Actor.Destroyed += Actor_Destroyed;
@@ -32,35 +31,38 @@
 
         public void StartPause()
         {
-            if (_timer.Enabled)
+            if (timer.Enabled)
             {
-                _timer.Stop();
+                timer.Stop();
             } else
             {
-                _timer.Start();
+                timer.Start();
             }
         }
 
         public void Dispose()
         {
-            ((IDisposable)_timer).Dispose();
+            ((IDisposable)timer).Dispose();
         }
 
         public void MovePlayer(Direction direction)
         {
-            if (!_timer.Enabled) return;
+            if (!timer.Enabled) return;
             _player_character.Move(direction);
         }
 
         public void PlaceBomb()
         {
-            if (!_timer.Enabled) return;
+            if (!timer.Enabled) return;
             _player_character.PlaceBomb();
         }
 
         private void Move_Enemies(object? sender, EventArgs e)
         {
-            foreach (var enemy in _enemies) enemy.Move();
+            lock (_enemies)
+            {
+                foreach (var enemy in _enemies) enemy.Move();
+            }
         }
 
         private void Bomb_Exploded(object? sender, BombExplodedEventArgs e)
@@ -76,9 +78,12 @@
             if (sender!.GetType() == typeof(PlayerCharacter))
             {
                 GameOver?.Invoke(this, new GameOverEventArgs(false));
+                timer?.Stop();
             } else {
-                _enemies.Remove((Enemy)sender);
-                _destroyed_enemies++;
+                lock (_enemies)
+                {
+                    _enemies.Remove((Enemy)sender);
+                }
                 if (_enemies.Count == 0)
                 {
                     GameOver?.Invoke(this, new GameOverEventArgs(true));

@@ -15,9 +15,17 @@
             _position = pos;
             Placed?.Invoke(this, EventArgs.Empty);
             _timer = new System.Timers.Timer(5000);
+            // To prevent explosions after the game has ended
+            Game.GameOver += Game_GameOver;
             _timer.Elapsed += Explode;
             _timer.Start();
         }
+
+        private void Game_GameOver(object? sender, GameOverEventArgs e)
+        {
+            _timer.Stop();
+        }
+
         public void Dispose()
         {
             _timer.Dispose();
@@ -26,6 +34,7 @@
         private void Explode(object? sender, EventArgs e)
         {
             Exploded?.Invoke(this, new BombExplodedEventArgs(_position));
+            _timer.Stop();
         }
     }
 }

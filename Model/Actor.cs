@@ -61,6 +61,9 @@
             if (Math.Abs(e.Position.Item1 - _position.Item1) < e.Radius && Math.Abs(e.Position.Item2 - _position.Item2) < e.Radius)
             {
                 Destroyed?.Invoke(this, new ActorDestroyedEventArgs(_position));
+
+                // To prevent dying to exposion when already dead, but not yet garbage collected
+                Bomb.Exploded -= Bomb_Exploded;
             }
         }
 

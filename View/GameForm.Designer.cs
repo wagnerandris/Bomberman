@@ -33,6 +33,8 @@
             status_strip = new StatusStrip();
             time_label = new ToolStripStatusLabel();
             destroyed_label = new ToolStripStatusLabel();
+            time = new ToolStripStatusLabel();
+            destroyed = new ToolStripStatusLabel();
             status_strip.SuspendLayout();
             SuspendLayout();
             // 
@@ -66,24 +68,38 @@
             // 
             // status_strip
             // 
-            status_strip.Items.AddRange(new ToolStripItem[] { time_label, destroyed_label });
-            status_strip.Location = new Point(0, 512);
+            status_strip.Items.AddRange(new ToolStripItem[] { time_label, time, destroyed_label, destroyed });
+            status_strip.Location = new Point(0, 510);
             status_strip.Name = "status_strip";
-            status_strip.Size = new Size(512, 22);
+            status_strip.Size = new Size(512, 24);
+            status_strip.SizingGrip = false;
             status_strip.TabIndex = 2;
             status_strip.Text = "statusStrip1";
             // 
             // time_label
             // 
             time_label.Name = "time_label";
-            time_label.Size = new Size(39, 17);
-            time_label.Text = "Time: ";
+            time_label.Size = new Size(36, 19);
+            time_label.Text = "Time:";
             // 
             // destroyed_label
             // 
             destroyed_label.Name = "destroyed_label";
-            destroyed_label.Size = new Size(112, 17);
-            destroyed_label.Text = "Enemies destroyed: ";
+            destroyed_label.Size = new Size(109, 19);
+            destroyed_label.Text = "Enemies destroyed:";
+            // 
+            // time
+            // 
+            time.BorderSides = ToolStripStatusLabelBorderSides.Right;
+            time.Name = "time";
+            time.Size = new Size(32, 19);
+            time.Text = "0:00";
+            // 
+            // destroyed
+            // 
+            destroyed.Name = "destroyed";
+            destroyed.Size = new Size(13, 19);
+            destroyed.Text = "0";
             // 
             // GameForm
             // 
@@ -113,5 +129,7 @@
         private StatusStrip status_strip;
         private ToolStripStatusLabel time_label;
         private ToolStripStatusLabel destroyed_label;
+        private ToolStripStatusLabel time;
+        private ToolStripStatusLabel destroyed;
     }
 }

@@ -9,11 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="asteroid1.png" />
-    <None Remove="stars_background.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="ELTE.EVA.SARuleSet" Version="2.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

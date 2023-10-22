@@ -27,7 +27,7 @@ namespace Model
             do
             {
                 _direction = (Direction)_possible_directions.GetValue(i)!;
-                i = i++ % _possible_directions.Length;
+                i = (i + 1) % _possible_directions.Length;
                 j++;
             }
             while (_tried_directions.Contains(_direction) && j < _possible_directions.Length);

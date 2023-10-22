@@ -58,9 +58,11 @@
             // 
             // map_picture
             // 
+            map_picture.BorderStyle = BorderStyle.FixedSingle;
             map_picture.Location = new Point(128, 192);
             map_picture.Name = "map_picture";
             map_picture.Size = new Size(256, 256);
+            map_picture.SizeMode = PictureBoxSizeMode.StretchImage;
             map_picture.TabIndex = 4;
             map_picture.TabStop = false;
             // 

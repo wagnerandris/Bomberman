@@ -7,10 +7,11 @@ namespace View
     public partial class GameForm : Form
     {
         private Game? _game;
-        private IMapReader? _mapReader;
         private readonly Random _random = new();
         private readonly Bitmap[] _wall_images = { Resources.asteroid1, Resources.asteroid2, Resources.asteroid3 };
 
+        private int _gametime = 0;
+        private int _destroyed_enemies = 0;
         private bool key_held;
 
         public GameForm()
@@ -20,6 +21,7 @@ namespace View
             menu.Start += Menu_Start;
             KeyDown += GameForm_KeyDown;
             KeyUp += GameForm_KeyUp;
+            Game.GameOver += Game_GameOver;
             Actor.Moved += Actor_Moved;
             Actor.Destroyed += Actor_Destroyed;
             Bomb.Placed += Bomb_Placed;
@@ -28,20 +30,23 @@ namespace View
 
         private void Menu_Start(object? sender, StartEventArgs e)
         {
+            IMapReader mapReader;
             try
             {
-                _mapReader = new TXTMapReader(e.Mapfile);
+                mapReader = new TXTMapReader(e.Mapfile);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Popup window
+                MessageBox.Show(ex.Message, "Mapfile Error", MessageBoxButtons.OK);
                 return;
             }
 
+            tile_map.UseWaitCursor = true;
+
             // Set up LayoutPanel grid
             tile_map.Controls.Clear();
-            tile_map.ColumnCount = _mapReader.Map.Width;
-            tile_map.RowCount = _mapReader.Map.Height;
+            tile_map.ColumnCount = mapReader.Map.Width;
+            tile_map.RowCount = mapReader.Map.Height;
 
             tile_map.RowStyles.Clear();
             tile_map.ColumnStyles.Clear();
@@ -56,13 +61,13 @@ namespace View
             }
 
 
-            int TileHeight = 512 / _mapReader.Map.Height;
-            int TileWidth = 512 / _mapReader.Map.Width;
+            int TileHeight = 512 / mapReader.Map.Height;
+            int TileWidth = 512 / mapReader.Map.Width;
 
 
-            for (int i = 0; i < _mapReader.Map.Width; i++)
+            for (int i = 0; i < mapReader.Map.Width; i++)
             {
-                for (int j = 0; j < _mapReader.Map.Height; j++)
+                for (int j = 0; j < mapReader.Map.Height; j++)
                 {
                     // Populating the map with tiles
                     tile_map.Controls.Add(new Panel()
@@ -74,7 +79,7 @@ namespace View
                     },
                         i, j);
 
-                    if (_mapReader.Map.Walls[i, j])
+                    if (mapReader.Map.Walls[i, j])
                     {
                         tile_map.GetControlFromPosition(i, j).BackgroundImage = _wall_images[_random.Next(3)];
                     }
@@ -82,28 +87,62 @@ namespace View
             }
 
             // Add enemies
-            foreach ((int, int) coords in _mapReader.Enemies_start)
+            foreach ((int, int) coords in mapReader.Enemies_start)
             {
                 tile_map.GetControlFromPosition(coords.Item1, coords.Item2).BackgroundImage = Resources.TIE;
             }
 
             // Add player
-            tile_map.GetControlFromPosition(_mapReader.Player_start.Item1, _mapReader.Player_start.Item2).BackgroundImage = Resources.Slave_I;
+            tile_map.GetControlFromPosition(mapReader.Player_start.Item1, mapReader.Player_start.Item2).BackgroundImage = Resources.Slave_I;
 
             // "Switch" to game screen
             menu.Visible = false;
             menu.Enabled = false;
             tile_map.Visible = true;
 
+            // needed to prevent bell sound when pressing space
+            // without this, focus remains on the start game button, which gets disabled
+            tile_map.Focus();
+
             // Init game
-            _game = new Game(_mapReader.Map, _mapReader.Enemies_start, _mapReader.Player_start);
-            _game.GameOver += _game_GameOver;
+            _game = new Game(mapReader.Map, mapReader.Enemies_start, mapReader.Player_start);
+            _game.timer.Elapsed += Timer_Elapsed;
+
+            tile_map.UseWaitCursor = false;
         }
 
-        private void _game_GameOver(object? sender, GameOverEventArgs e)
+        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
-            // Popup
-            throw new NotImplementedException();
+            if (status_strip.InvokeRequired)
+            {
+                status_strip.Invoke(new Action<object, System.Timers.ElapsedEventArgs>(Timer_Elapsed), sender, e);
+                return;
+            }
+            _gametime++;
+            time.Text = $"{_gametime/60}:{_gametime%60}";
+        }
+
+        private void Game_GameOver(object? sender, GameOverEventArgs e)
+        {
+            if (tile_map.InvokeRequired)
+            {
+                tile_map.Invoke(new Action<object, GameOverEventArgs>(Game_GameOver), sender, e);
+                return;
+            }
+            
+            MessageBox.Show(String.Format("{0} Game Time: {1} Destryed Enemies: {2}", e.Player_won ? "Victory!" : "Defeat!", _gametime, _destroyed_enemies), "Game Over", MessageBoxButtons.OK);
+
+            _game = null;
+            tile_map.Visible = false;
+
+            _destroyed_enemies = 0;
+            destroyed.Text = _destroyed_enemies.ToString();
+            _gametime = 0;
+            time.Text = $"{_gametime/60}:{_gametime%60}";
+
+            menu.Visible = true;
+            menu.Enabled = true;
+            menu.Focus();
         }
 
         private void Actor_Moved(object? sender, ActorMovedEventArgs e)
@@ -138,6 +177,7 @@ namespace View
             if (tile_map.InvokeRequired)
             {
                 tile_map.Invoke(new Action<object, EventArgs>(Bomb_Placed), sender, e);
+                return;
             }
 
             tile_map.GetControlFromPosition(((Bomb)sender).Position.Item1, ((Bomb)sender).Position.Item2).BackgroundImage = Resources.seismic_charge;
@@ -151,6 +191,7 @@ namespace View
             if (tile_map.InvokeRequired)
             {
                 tile_map.Invoke(new Action<object, BombExplodedEventArgs>(Bomb_Exploded), sender, e);
+                return;
             }
 
             tile_map.GetControlFromPosition(e.Position.Item1, e.Position.Item2).BackgroundImage = null;
@@ -162,9 +203,16 @@ namespace View
             if (tile_map.InvokeRequired)
             {
                 tile_map.Invoke(new Action<object, ActorDestroyedEventArgs>(Actor_Destroyed), sender, e);
+                return;
             }
 
             tile_map.GetControlFromPosition(e.Position.Item1, e.Position.Item2).BackgroundImage = null;
+
+            if (sender!.GetType() == typeof(Enemy)) {
+                _destroyed_enemies++;
+                destroyed.Text = _destroyed_enemies.ToString();
+            }
+
         }
 
         private void GameForm_KeyUp(object? sender, KeyEventArgs e)

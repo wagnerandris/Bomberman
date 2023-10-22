@@ -51,6 +51,8 @@ namespace Persistence
                 }
             }
 
+            if (Enemies_start.Count == 0) throw new MapFileException("No enemies found in mapfile.");
+
             Map = new Map(walls, width, height);
         }
     }
