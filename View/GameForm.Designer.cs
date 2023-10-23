@@ -32,8 +32,8 @@
             menu = new Menu();
             status_strip = new StatusStrip();
             time_label = new ToolStripStatusLabel();
-            destroyed_label = new ToolStripStatusLabel();
             time = new ToolStripStatusLabel();
+            destroyed_label = new ToolStripStatusLabel();
             destroyed = new ToolStripStatusLabel();
             status_strip.SuspendLayout();
             SuspendLayout();
@@ -69,7 +69,7 @@
             // status_strip
             // 
             status_strip.Items.AddRange(new ToolStripItem[] { time_label, time, destroyed_label, destroyed });
-            status_strip.Location = new Point(0, 510);
+            status_strip.Location = new Point(0, 512);
             status_strip.Name = "status_strip";
             status_strip.Size = new Size(512, 24);
             status_strip.SizingGrip = false;
@@ -82,18 +82,18 @@
             time_label.Size = new Size(36, 19);
             time_label.Text = "Time:";
             // 
-            // destroyed_label
-            // 
-            destroyed_label.Name = "destroyed_label";
-            destroyed_label.Size = new Size(109, 19);
-            destroyed_label.Text = "Enemies destroyed:";
-            // 
             // time
             // 
             time.BorderSides = ToolStripStatusLabelBorderSides.Right;
             time.Name = "time";
             time.Size = new Size(32, 19);
             time.Text = "0:00";
+            // 
+            // destroyed_label
+            // 
+            destroyed_label.Name = "destroyed_label";
+            destroyed_label.Size = new Size(109, 19);
+            destroyed_label.Text = "Enemies destroyed:";
             // 
             // destroyed
             // 
@@ -106,13 +106,13 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.stars_background;
-            ClientSize = new Size(512, 534);
+            ClientSize = new Size(512, 536);
             Controls.Add(status_strip);
             Controls.Add(menu);
             Controls.Add(tile_map);
             KeyPreview = true;
-            MaximumSize = new Size(528, 573);
-            MinimumSize = new Size(528, 573);
+            MaximumSize = new Size(528, 575);
+            MinimumSize = new Size(528, 575);
             Name = "GameForm";
             SizeGripStyle = SizeGripStyle.Hide;
             Text = "Bomberman";

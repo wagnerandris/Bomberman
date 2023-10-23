@@ -20,9 +20,12 @@
             }
         }
 
-        internal void PlaceBomb()
+        public void PlaceBomb()
         {
-            _bombs.Add(new Bomb(Position));
+            lock (_bombs)
+            {
+                _bombs.Add(new Bomb(Position));
+            }
         }
     }
 }

@@ -58,11 +58,12 @@
 
         private void Bomb_Exploded(object? sender, BombExplodedEventArgs e)
         {
-            if (Math.Abs(e.Position.Item1 - _position.Item1) < e.Radius && Math.Abs(e.Position.Item2 - _position.Item2) < e.Radius)
+            if (Math.Abs(e.Position.Item1 - _position.Item1) <= e.Radius && Math.Abs(e.Position.Item2 - _position.Item2) <= e.Radius)
             {
                 Destroyed?.Invoke(this, new ActorDestroyedEventArgs(_position));
 
-                // To prevent dying to exposion when already dead, but not yet garbage collected
+                // To prevent dying to exposion when already dead, but not yet garbage collected.
+                // Not very effective.
                 Bomb.Exploded -= Bomb_Exploded;
             }
         }

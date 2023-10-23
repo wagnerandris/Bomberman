@@ -1,5 +1,6 @@
 using Model;
 using Persistence;
+using System.Timers;
 using View.Properties;
 
 namespace View
@@ -9,6 +10,10 @@ namespace View
         private Game? _game;
         private readonly Random _random = new();
         private readonly Bitmap[] _wall_images = { Resources.asteroid1, Resources.asteroid2, Resources.asteroid3 };
+        private readonly Dictionary<(int, int), PictureBox> _bombs = new();
+
+        private int _tile_width;
+        private int _tile_height;
 
         private int _gametime = 0;
         private int _destroyed_enemies = 0;
@@ -61,8 +66,8 @@ namespace View
             }
 
 
-            int TileHeight = 512 / mapReader.Map.Height;
-            int TileWidth = 512 / mapReader.Map.Width;
+            _tile_width = 512 / mapReader.Map.Width;
+            _tile_height = 512 / mapReader.Map.Height;
 
 
             for (int i = 0; i < mapReader.Map.Width; i++)
@@ -73,8 +78,8 @@ namespace View
                     tile_map.Controls.Add(new Panel()
                     {
                         BackgroundImageLayout = ImageLayout.Stretch,
-                        Height = TileHeight,
-                        Width = TileWidth,
+                        Height = _tile_height,
+                        Width = _tile_width,
                         Margin = new Padding(0)
                     },
                         i, j);
@@ -104,6 +109,11 @@ namespace View
             // without this, focus remains on the start game button, which gets disabled
             tile_map.Focus();
 
+            // Reset variables representing game specific data
+            _destroyed_enemies = 0;
+            _gametime = 0;
+            _bombs.Clear();
+
             // Init game
             _game = new Game(mapReader.Map, mapReader.Enemies_start, mapReader.Player_start);
             _game.timer.Elapsed += Timer_Elapsed;
@@ -119,7 +129,7 @@ namespace View
                 return;
             }
             _gametime++;
-            time.Text = $"{_gametime/60}:{_gametime%60}";
+            time.Text = $"{_gametime / 60}:{_gametime % 60}";
         }
 
         private void Game_GameOver(object? sender, GameOverEventArgs e)
@@ -129,16 +139,24 @@ namespace View
                 tile_map.Invoke(new Action<object, GameOverEventArgs>(Game_GameOver), sender, e);
                 return;
             }
-            
+
+            // So that if multiple game over signals come i.e.: player and last enemy destoyed at the same time, only the first registeres
+            if (_game != null)
+            {
+                _game.timer.Elapsed -= Timer_Elapsed;
+            }
+
+            tile_map.Visible = false;
+            foreach (var bomb in _bombs)
+            {
+                Controls.Remove(bomb.Value);
+            }
+
             MessageBox.Show(String.Format("{0} Game Time: {1} Destryed Enemies: {2}", e.Player_won ? "Victory!" : "Defeat!", _gametime, _destroyed_enemies), "Game Over", MessageBoxButtons.OK);
 
             _game = null;
-            tile_map.Visible = false;
-
-            _destroyed_enemies = 0;
-            destroyed.Text = _destroyed_enemies.ToString();
-            _gametime = 0;
-            time.Text = $"{_gametime/60}:{_gametime%60}";
+            destroyed.Text = "0";
+            time.Text = "0:0";
 
             menu.Visible = true;
             menu.Enabled = true;
@@ -174,28 +192,53 @@ namespace View
         {
             if (sender == null) return;
 
-            if (tile_map.InvokeRequired)
-            {
-                tile_map.Invoke(new Action<object, EventArgs>(Bomb_Placed), sender, e);
-                return;
-            }
+            (int, int) pos = ((Bomb)sender).Position;
 
-            tile_map.GetControlFromPosition(((Bomb)sender).Position.Item1, ((Bomb)sender).Position.Item2).BackgroundImage = Resources.seismic_charge;
+            _bombs.Add(
+                pos,
+                new PictureBox()
+                {
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Location = new Point(pos.Item1 * _tile_width + 1, pos.Item2 * _tile_height + 1),
+                    Margin = new Padding(0),
+                    BackColor = Color.Transparent,
+                    BackgroundImage = null,
+                    Size = new Size(_tile_width, _tile_height),
+                    Image = Resources.seismic_charge
+                }
+                );
+
+            Controls.Add(_bombs[pos]);
+            _bombs[pos].BringToFront();
+
+            // So that bombs don't explode over status strip
+            status_strip.BringToFront();
+
         }
 
-        private void Bomb_Exploded(object? sender, BombExplodedEventArgs e)
+        private async void Bomb_Exploded(object? sender, BombExplodedEventArgs e)
         {
-            // TODO: Draw on background instead
-            if (sender == null) return;
+            // This can only happen if threads are not in sync and a bomb explodes after Game Over
+            if (_bombs.Count == 0) return;
 
-            if (tile_map.InvokeRequired)
+            if (InvokeRequired)
             {
-                tile_map.Invoke(new Action<object, BombExplodedEventArgs>(Bomb_Exploded), sender, e);
+                Invoke(new Action<object, BombExplodedEventArgs>(Bomb_Exploded), sender, e);
                 return;
             }
 
-            tile_map.GetControlFromPosition(e.Position.Item1, e.Position.Item2).BackgroundImage = null;
-            // Play explosion animation
+            PictureBox bomb = _bombs[e.Position];
+            bomb.Visible = false;
+            bomb.Left -= _tile_width * 3;
+            bomb.Top -= _tile_height * 3;
+            bomb.Size = new Size(_tile_width * 7, _tile_height * 7);
+            bomb.Image = Resources.seismic_wave;
+            bomb.Visible = true;
+
+            await Task.Delay(1000);
+
+            Controls.Remove(_bombs[e.Position]);
+            _bombs.Remove(e.Position);
         }
 
         private void Actor_Destroyed(object? sender, ActorDestroyedEventArgs e)
@@ -208,7 +251,8 @@ namespace View
 
             tile_map.GetControlFromPosition(e.Position.Item1, e.Position.Item2).BackgroundImage = null;
 
-            if (sender!.GetType() == typeof(Enemy)) {
+            if (sender!.GetType() == typeof(Enemy))
+            {
                 _destroyed_enemies++;
                 destroyed.Text = _destroyed_enemies.ToString();
             }
