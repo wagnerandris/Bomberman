@@ -45,6 +45,8 @@
         public void Dispose()
         {
             ((IDisposable)timer).Dispose();
+            Bomb.Exploded -= Bomb_Exploded;
+            Actor.Destroyed -= Actor_Destroyed;
         }
 
         public void MovePlayer(Direction direction)
@@ -73,7 +75,6 @@
                 {
                     bombs[i].Tick();
                 }
-                //foreach (Bomb bomb in _bombs) bomb.Tick();
             }
 
         }
@@ -91,10 +92,6 @@
         {
             timer.Stop();
             Dispose();
-            lock (_bombs)
-            {
-                _bombs.Clear();
-            }
             GameOver?.Invoke(this, new GameOverEventArgs(player_won));
         }
 

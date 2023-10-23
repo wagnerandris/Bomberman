@@ -14,7 +14,7 @@
             base.Move(((int, int))new_position);
             
             // If the player steps on an enemy, it's game over
-            if (!_enemies.All(e => e.Position != new_position))
+            if (!_enemies.TrueForAll(e => e.Position != new_position))
             {
                 InvokeDestroyed(this);
             }

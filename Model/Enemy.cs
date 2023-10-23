@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace Model
+﻿namespace Model
 {
     public class Enemy : Actor
     {
@@ -39,7 +37,7 @@ namespace Model
             if (new_position == null) return null;
 
             // Enemies may not step on each other or bombs
-            if (!_enemies.All(e => e.Position != new_position) || !_bombs.All(e => e.Position != new_position)) return null;
+            if (!_enemies.TrueForAll(e => e.Position != new_position) || !_bombs.TrueForAll(e => e.Position != new_position)) return null;
 
             return new_position;
         }
