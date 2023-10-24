@@ -1,11 +1,4 @@
-﻿using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ModelTest
+﻿namespace ModelTest
 {
     [TestClass]
     public class EnemyTest
@@ -90,29 +83,6 @@ namespace ModelTest
             _enemy.Move();
 
             Assert.AreEqual((0, 1), _enemy.Position);
-        }
-
-        [TestMethod]
-        public void ExplodedTest()
-        {
-            Actor.Destroyed += Actor_Exploded;
-
-            Bomb bomb = new((0, 1));
-
-            for (int i = 0; i < 5; i++)
-            {
-                bomb.Tick();
-            }
-
-            Actor.Destroyed -= Actor_Exploded;
-        }
-
-        
-        private void Actor_Exploded(object? sender, ActorDestroyedEventArgs e)
-        {
-            Assert.IsNotNull(sender);
-            Assert.AreSame(_enemy, (Enemy)sender);
-            Assert.AreEqual(_enemy.Position, e.Position);
         }
 
         [TestMethod]

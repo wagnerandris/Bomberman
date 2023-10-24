@@ -30,6 +30,20 @@
             Actor.Destroyed += Actor_Destroyed;
         }
 
+        public void Dispose()
+        {
+            ((IDisposable)timer).Dispose();
+            Bomb.Exploded -= Bomb_Exploded;
+            Actor.Destroyed -= Actor_Destroyed;
+        }
+
+        private void SendGameOver(bool player_won)
+        {
+            timer.Stop();
+            Dispose();
+            GameOver?.Invoke(this, new GameOverEventArgs(player_won));
+        }
+
         public void StartPause()
         {
             if (timer.Enabled)
@@ -40,13 +54,6 @@
             {
                 timer.Start();
             }
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)timer).Dispose();
-            Bomb.Exploded -= Bomb_Exploded;
-            Actor.Destroyed -= Actor_Destroyed;
         }
 
         public void MovePlayer(Direction direction)
@@ -86,13 +93,27 @@
             {
                 _bombs.Remove((Bomb)sender);
             }
-        }
 
-        private void SendGameOver(bool player_won)
-        {
-            timer.Stop();
-            Dispose();
-            GameOver?.Invoke(this, new GameOverEventArgs(player_won));
+            if (Math.Abs(e.Position.Item1 - _player_character.Position.Item1) <= e.Radius && Math.Abs(e.Position.Item2 - _player_character.Position.Item2) <= e.Radius)
+            {
+                SendGameOver(false);
+                return;
+            }
+
+            var exploded_enemies = _enemies.Select(enemy => enemy).Where
+                                    (enemy =>
+                                    Math.Abs(e.Position.Item1 - enemy.Position.Item1) <= e.Radius &&
+                                    Math.Abs(e.Position.Item2 - enemy.Position.Item2) <= e.Radius
+                                    ).ToList();
+
+            lock (_enemies)
+            {
+                foreach (Enemy enemy in exploded_enemies)
+                {
+                    enemy.InvokeDestroyed();
+                    _enemies.Remove(enemy);
+                }
+            }
         }
 
         private void Actor_Destroyed(object? sender, ActorDestroyedEventArgs e)
