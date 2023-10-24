@@ -73,7 +73,7 @@
             // If the player is stepped on it's destroyed
             if (_player.Position == new_position)
             {
-                InvokeDestroyed(_player);
+                _player.InvokeDestroyed();
             }
         }
     }

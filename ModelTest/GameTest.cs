@@ -1,4 +1,4 @@
-namespace ModelTest
+﻿namespace ModelTest
 {
     [TestClass]
     public class GameTest : IDisposable
@@ -36,7 +36,7 @@ namespace ModelTest
         public void StartPauseTest()
         {
             Assert.IsFalse(_game.timer.Enabled);
-            
+
             _game.StartPause();
             Assert.IsTrue(_game.timer.Enabled);
 
@@ -121,6 +121,27 @@ namespace ModelTest
             Assert.IsNotNull(sender);
             Assert.IsInstanceOfType(sender, typeof(Bomb));
             Assert.AreEqual((0, 0), ((Bomb)sender).Position);
+        }
+
+        [TestMethod]
+        public async Task TickBombAndExplodePlayerTets()
+        {
+            _game.PlaceBomb();
+            _game.timer.Interval = 100;
+            Game.GameOver += GameLost;
+
+            _game.timer.Start();
+
+            await Task.Delay(500);
+
+            _game.timer.Stop();
+
+            Game.GameOver -= GameLost;
+        }
+
+        private void GameLost(object? sender, GameOverEventArgs e)
+        {
+            Assert.AreEqual(false, e.Player_won);
         }
 
         public void Dispose()
