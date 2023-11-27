@@ -16,7 +16,7 @@
             // If the player steps on an enemy, it's game over
             if (!_enemies.TrueForAll(e => e.Position != new_position))
             {
-                InvokeDestroyed(this);
+                InvokeDestroyed();
             }
         }
 
@@ -24,6 +24,7 @@
         {
             lock (_bombs)
             {
+                if (!_bombs.TrueForAll(e => e.Position != Position)) return;
                 _bombs.Add(new Bomb(Position));
             }
         }

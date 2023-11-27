@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\asteroid1.png" />
+    <None Remove="Resources\asteroid2.png" />
+    <None Remove="Resources\asteroid3.png" />
+    <None Remove="Resources\map1.jpg" />
+    <None Remove="Resources\map2.jpg" />
+    <None Remove="Resources\map3.jpg" />
+    <None Remove="Resources\seismic_charge.png" />
+    <None Remove="Resources\seismic_wave.png" />
+    <None Remove="Resources\Slave_I.png" />
+    <None Remove="Resources\stars_background.jpg" />
+    <None Remove="Resources\TIE.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\asteroid1.png" />
+    <Resource Include="Resources\asteroid2.png" />
+    <Resource Include="Resources\asteroid3.png" />
+    <Resource Include="Resources\map1.jpg" />
+    <Resource Include="Resources\map2.jpg" />
+    <Resource Include="Resources\map3.jpg" />
+    <Resource Include="Resources\seismic_charge.png" />
+    <Resource Include="Resources\seismic_wave.png" />
+    <Resource Include="Resources\Slave_I.png" />
+    <Resource Include="Resources\stars_background.jpg" />
+    <Resource Include="Resources\TIE.png" />
+  </ItemGroup>
+</Project>

@@ -18,8 +18,6 @@
             _map = map;
             _enemies = enemies;
             _bombs = bombs;
-
-            Bomb.Exploded += Bomb_Exploded;
         }
 
         protected virtual (int, int)? NewPosition(Direction direction)
@@ -56,21 +54,9 @@
             Moved?.Invoke(this, new ActorMovedEventArgs(old_position));
         }
 
-        private void Bomb_Exploded(object? sender, BombExplodedEventArgs e)
+        public void InvokeDestroyed()
         {
-            if (Math.Abs(e.Position.Item1 - _position.Item1) <= e.Radius && Math.Abs(e.Position.Item2 - _position.Item2) <= e.Radius)
-            {
-                Destroyed?.Invoke(this, new ActorDestroyedEventArgs(_position));
-
-                // To prevent dying to exposion when already dead, but not yet garbage collected.
-                // Not very effective.
-                Bomb.Exploded -= Bomb_Exploded;
-            }
-        }
-
-        protected void InvokeDestroyed(Actor actor)
-        {
-            Destroyed?.Invoke(actor, new ActorDestroyedEventArgs(_position));
+            Destroyed?.Invoke(this, new ActorDestroyedEventArgs(_position));
         }
     }
 }

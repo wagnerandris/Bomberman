@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="WPFView.MenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPFView"
+             mc:Ignorable="d" 
+             d:DesignHeight="536" d:DesignWidth="512">
+    <Canvas>
+        <Image Height="256" Width="256" Canvas.Left="128" Canvas.Top="160" HorizontalAlignment="Left" VerticalAlignment="Top" Source="{Binding MapImage}"/>
+        <Button Height="64" Width="32" Canvas.Left="96" Canvas.Top="256" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding PrevMapCommand}"/>
+        <Button Height="64" Width="32" Canvas.Left="384" Canvas.Top="256" HorizontalAlignment="Center" VerticalAlignment="Top" Command="{Binding NextMapCommand}"/>
+        <Button Content="Start Game" Canvas.Left="192" Canvas.Top="96" Height="32" Width="128" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding StartCommand}"/>
+    </Canvas>
+</UserControl>

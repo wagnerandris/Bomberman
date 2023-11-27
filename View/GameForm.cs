@@ -17,7 +17,7 @@ namespace View
 
         private int _gametime = 0;
         private int _destroyed_enemies = 0;
-        private bool key_held;
+        private bool _key_held;
 
         public GameForm()
         {
@@ -152,7 +152,7 @@ namespace View
                 Controls.Remove(bomb.Value);
             }
 
-            MessageBox.Show(String.Format("{0} Game Time: {1} Destryed Enemies: {2}", e.Player_won ? "Victory!" : "Defeat!", _gametime, _destroyed_enemies), "Game Over", MessageBoxButtons.OK);
+            MessageBox.Show(String.Format("{0} Game Time: {1} Destroyed Enemies: {2}", e.Player_won ? "Victory!" : "Defeat!", _gametime, _destroyed_enemies), "Game Over", MessageBoxButtons.OK);
 
             _game = null;
             destroyed.Text = "0";
@@ -261,13 +261,13 @@ namespace View
 
         private void GameForm_KeyUp(object? sender, KeyEventArgs e)
         {
-            key_held = false;
+            _key_held = false;
         }
 
         private void GameForm_KeyDown(object? sender, KeyEventArgs e)
         {
-            if (key_held) return;
-            key_held = true;
+            if (_key_held) return;
+            _key_held = true;
 
             if (_game == null) return;
 

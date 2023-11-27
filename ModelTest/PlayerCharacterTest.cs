@@ -94,28 +94,6 @@
         }
 
         [TestMethod]
-        public void ExplodedTest()
-        {
-            Actor.Destroyed += Actor_Exploded;
-
-            Bomb bomb = new((0, 1));
-
-            for (int i = 0; i < 5; i++)
-            {
-                bomb.Tick();
-            }
-
-            Actor.Destroyed -= Actor_Exploded;
-        }
-
-        private void Actor_Exploded(object? sender, ActorDestroyedEventArgs e)
-        {
-            Assert.IsNotNull(sender);
-            Assert.AreSame(_player, (PlayerCharacter)sender);
-            Assert.AreEqual(_player.Position, e.Position);
-        }
-
-        [TestMethod]
         public void EnemyCollisionTest()
         {
             _enemies.Add(new Enemy((0, 1), _map, _enemies, _player, _bombs));

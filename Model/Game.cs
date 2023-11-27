@@ -1,4 +1,6 @@
-﻿namespace Model
+﻿using System.Timers;
+
+namespace Model
 {
     public class Game : IDisposable
     {
@@ -7,7 +9,18 @@
         private readonly List<Bomb> _bombs;
         private readonly PlayerCharacter _player_character;
         
-        public readonly System.Timers.Timer timer;
+        private readonly System.Timers.Timer _timer;
+        public event ElapsedEventHandler TimerElapsed
+        {
+            add
+            {
+                _timer.Elapsed += value;
+            }
+            remove
+            {
+                _timer.Elapsed -= value;
+            }
+        }
 
         public static event EventHandler<GameOverEventArgs>? GameOver;
 
@@ -22,42 +35,49 @@
                 _enemies.Add(new Enemy(pos, _map, _enemies, _player_character, _bombs));
             }
             
-            timer = new System.Timers.Timer(1000);
-            timer.Elapsed += Move_And_Tick;
-            timer.Start();
+            _timer = new System.Timers.Timer(1000);
+            _timer.Elapsed += Move_And_Tick;
+            _timer.Start();
 
             Bomb.Exploded += Bomb_Exploded;
             Actor.Destroyed += Actor_Destroyed;
         }
 
-        public void StartPause()
-        {
-            if (timer.Enabled)
-            {
-                timer.Stop();
-            }
-            else
-            {
-                timer.Start();
-            }
-        }
-
         public void Dispose()
         {
-            ((IDisposable)timer).Dispose();
+            ((IDisposable)_timer).Dispose();
             Bomb.Exploded -= Bomb_Exploded;
             Actor.Destroyed -= Actor_Destroyed;
         }
 
+        private void SendGameOver(bool player_won)
+        {
+            _timer.Stop();
+            Dispose();
+            GameOver?.Invoke(this, new GameOverEventArgs(player_won));
+        }
+
+        public void StartPause()
+        {
+            if (_timer.Enabled)
+            {
+                _timer.Stop();
+            }
+            else
+            {
+                _timer.Start();
+            }
+        }
+
         public void MovePlayer(Direction direction)
         {
-            if (!timer.Enabled) return;
+            if (!_timer.Enabled) return;
             _player_character.Move(direction);
         }
 
         public void PlaceBomb()
         {
-            if (!timer.Enabled) return;
+            if (!_timer.Enabled) return;
             _player_character.PlaceBomb();
         }
 
@@ -86,13 +106,27 @@
             {
                 _bombs.Remove((Bomb)sender);
             }
-        }
 
-        private void SendGameOver(bool player_won)
-        {
-            timer.Stop();
-            Dispose();
-            GameOver?.Invoke(this, new GameOverEventArgs(player_won));
+            if (Math.Abs(e.Position.Item1 - _player_character.Position.Item1) <= e.Radius && Math.Abs(e.Position.Item2 - _player_character.Position.Item2) <= e.Radius)
+            {
+                SendGameOver(false);
+                return;
+            }
+
+            var exploded_enemies = _enemies.Select(enemy => enemy).Where
+                                    (enemy =>
+                                    Math.Abs(e.Position.Item1 - enemy.Position.Item1) <= e.Radius &&
+                                    Math.Abs(e.Position.Item2 - enemy.Position.Item2) <= e.Radius
+                                    ).ToList();
+
+            lock (_enemies)
+            {
+                foreach (Enemy enemy in exploded_enemies)
+                {
+                    enemy.InvokeDestroyed();
+                    _enemies.Remove(enemy);
+                }
+            }
         }
 
         private void Actor_Destroyed(object? sender, ActorDestroyedEventArgs e)
