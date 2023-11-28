@@ -4,10 +4,9 @@
     public class PlayerCharacterTest
     {
         private readonly bool[,] walls = {
-            // coordinates are (x,y), sot his is visually transposed
-            { false, false, false }, // first column x = 0
-            { true,  false, true  },
-            { false, false, true  },
+            { false, true,  false },
+            { false, false, false  },
+            { false, true,  true  },
         };
         private readonly Map _map;
         private List<Enemy> _enemies = null!;
@@ -34,13 +33,13 @@
             Assert.AreEqual((0, 0), _player.Position);
 
             _player.Move(Direction.Down);
-            Assert.AreEqual((0, 1), _player.Position);
+            Assert.AreEqual((1, 0), _player.Position);
 
             _player.Move(Direction.Right);
             Assert.AreEqual((1, 1), _player.Position);
 
             _player.Move(Direction.Left);
-            Assert.AreEqual((0, 1), _player.Position);
+            Assert.AreEqual((1, 0), _player.Position);
 
             _player.Move(Direction.Up);
             Assert.AreEqual((0, 0), _player.Position);

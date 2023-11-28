@@ -92,10 +92,9 @@ namespace ViewModel
             }
         }
 
-        // I guess coordinates are switched compared to Windows Forms
         public int IndFromPos((int, int) pos)
         {
-            return pos.Item2 * ColumnCount + pos.Item1;
+            return pos.Item1 * ColumnCount + pos.Item2;
         }
 
         public GameViewModel()
@@ -142,8 +141,7 @@ namespace ViewModel
             {
                 for (int j = 0; j < mapReader.Map.Height; j++)
                 {
-                    // I guess coordinates are switched compared to Windows Forms
-                    Tiles.Add(mapReader.Map.Walls[j, i] ? ((BitmapImage)Application.Current.Resources[_wall_image_names[_random.Next(3)]]) : null!);
+                    Tiles.Add(mapReader.Map.Walls[i, j] ? ((BitmapImage)Application.Current.Resources[_wall_image_names[_random.Next(3)]]) : null!);
                 }
             }
 
@@ -216,7 +214,7 @@ namespace ViewModel
             Application.Current.Dispatcher.Invoke(() =>
             {
                 Bombs.Add(new BombViewModel(
-                    pos.Item1 * TileWidth, pos.Item2 * TileHeight,
+                    pos.Item2 * TileWidth, pos.Item1 * TileHeight,
                     TileWidth, TileHeight
                     ));
             });
@@ -229,7 +227,7 @@ namespace ViewModel
 
             int i = 0;
             // > If I had more time, I would have written ~a shorter letter~ better code. -- Blaise Pascal
-            while (i < Bombs.Count && (Bombs[i].X != e.Position.Item1 * TileWidth || Bombs[i].Y != e.Position.Item2 * TileHeight)) i++;
+            while (i < Bombs.Count && (Bombs[i].X != e.Position.Item2 * TileWidth || Bombs[i].Y != e.Position.Item1 * TileHeight)) i++;
 
             if (i == Bombs.Count) return;
 

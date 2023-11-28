@@ -28,7 +28,7 @@ namespace Persistence
             int width = lines[0].Length;
 
             bool player_found = false;
-            bool [,] walls = new bool[width, height];
+            bool [,] walls = new bool[height, width];
             for (int j = 0; j < height; j++)
             {
                 if (lines[j].Length != width) throw new MapFileException("Uneven dimensions found in mapfile.");
@@ -37,13 +37,13 @@ namespace Persistence
                     switch (lines[j][i])
                     {
                         case '#':
-                            walls[i, j] = true; break;
+                            walls[j, i] = true; break;
                         case '*':
-                            Enemies_start.Add((i, j)); break;
+                            Enemies_start.Add((j, i)); break;
                         case '@':
                             if (player_found) throw new MapFileException("Multiple player characters found in mapfile.");
                             player_found = true;
-                            Player_start = (i, j); break;
+                            Player_start = (j, i); break;
                         case '.':
                             break;
                         default: throw new MapFileException("Invalid character found in mapfile.");

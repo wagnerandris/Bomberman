@@ -26,20 +26,20 @@
             switch (direction)
             {
                 case Direction.Left:
-                    if (new_position.Item1 == 0) return null;
-                    new_position.Item1 -= 1;
-                    break;
-                case Direction.Right:
-                    if (new_position.Item1 == _map.Width - 1) return null;
-                    new_position.Item1 += 1;
-                    break;
-                case Direction.Up:
                     if (new_position.Item2 == 0) return null;
                     new_position.Item2 -= 1;
                     break;
-                case Direction.Down:
-                    if (new_position.Item2 == _map.Height - 1) return null;
+                case Direction.Right:
+                    if (new_position.Item2 == _map.Width - 1) return null;
                     new_position.Item2 += 1;
+                    break;
+                case Direction.Up:
+                    if (new_position.Item1 == 0) return null;
+                    new_position.Item1 -= 1;
+                    break;
+                case Direction.Down:
+                    if (new_position.Item1 == _map.Height - 1) return null;
+                    new_position.Item1 += 1;
                     break;
             }
 
