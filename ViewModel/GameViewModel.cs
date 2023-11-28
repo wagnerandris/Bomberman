@@ -8,7 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace ViewModel
 {
-    public class GameViewModel : ViewModelBase
+    public class GameViewModel : ViewModelBase, IDisposable
     {
         private Game? _game;
         private readonly Random _random = new();
@@ -67,8 +67,6 @@ namespace ViewModel
                 OnPropertyChanged();
             }
         }
-
-        private bool _key_held;
 
         private int _tile_width;
         public int TileWidth
@@ -175,7 +173,7 @@ namespace ViewModel
 
             MessageBox.Show(String.Format("{0} Game Time: {1} Destroyed Enemies: {2}", e.Player_won ? "Victory!" : "Defeat!", GameTime, DestroyedEnemies), "Game Over");
 
-            GameOver.Invoke(this, EventArgs.Empty);
+            GameOver?.Invoke(this, EventArgs.Empty);
 
             _game = null;
         }
@@ -233,7 +231,7 @@ namespace ViewModel
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                Bombs[i].explode();
+                Bombs[i].Explode();
             });
 
             await Task.Delay(1000);
@@ -284,6 +282,11 @@ namespace ViewModel
                 default:
                     break;
             }
+        }
+
+        public void Dispose()
+        {
+            _game?.Dispose();
         }
     }
 }

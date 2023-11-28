@@ -21,9 +21,9 @@ namespace WPFView
 
         private void App_Startup(object sender, StartupEventArgs e)
         {
-            MainWindow window = new MainWindow();
+            MainWindow window = new();
 
-            MainViewModel ViewModel = new MainViewModel();
+            MainViewModel ViewModel = new();
             window.DataContext = ViewModel;
 
             window.Show();

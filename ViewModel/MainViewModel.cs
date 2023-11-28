@@ -9,13 +9,13 @@ using System.Windows.Input;
 namespace ViewModel
 {
 
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase, IDisposable
     {
 
-        private MenuViewModel _menu_view_model;
-        private GameViewModel _game_view_model;
+        private readonly MenuViewModel _menu_view_model;
+        private readonly GameViewModel _game_view_model;
 
-        private ViewModelBase _current_veiw_model;
+        private ViewModelBase _current_veiw_model = null!;
 
         public ViewModelBase CurrentViewModel
         {
@@ -33,7 +33,7 @@ namespace ViewModel
             _menu_view_model = new MenuViewModel();
             _game_view_model = new GameViewModel();
 
-            KeyDownCommand = new DelegateCommand(param => _game_view_model.KeyDown(param.ToString()));
+            KeyDownCommand = new DelegateCommand(param => _game_view_model.KeyDown(param!.ToString()!));
 
             _menu_view_model.Start += Menu_Start;
             _game_view_model.GameOver += Game_Over;
@@ -50,6 +50,11 @@ namespace ViewModel
         private void Game_Over(object? sender, EventArgs e)
         {
             CurrentViewModel = _menu_view_model;
+        }
+
+        public void Dispose()
+        {
+            _game_view_model.Dispose();
         }
     }
 }

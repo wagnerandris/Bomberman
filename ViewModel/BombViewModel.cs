@@ -9,7 +9,7 @@ namespace ViewModel
         private int y;
         private int width;
         private int height;
-        private BitmapImage image;
+        private BitmapImage? image;
 
         //TODO explosion
         public int X
@@ -48,7 +48,7 @@ namespace ViewModel
                 OnPropertyChanged();
             }
         }
-        public BitmapImage Image
+        public BitmapImage? Image
         {
             get => image;
             set
@@ -67,7 +67,7 @@ namespace ViewModel
             Image = (BitmapImage)Application.Current.Resources["Bomb"];
         }
 
-        public void explode()
+        public void Explode()
         {
             X -= 3 * Width;
             Y -= 3 * Height;
