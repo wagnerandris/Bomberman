@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiView.GamePage"
+             Title="GamePage">
+    <Grid Margin="4" RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+            <AbsoluteLayout Grid.Row="1" Grid.Column="1">
+                <Grid
+                    AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All"
+                    BindableLayout.ItemsSource="{Binding Tiles}"
+                    RowDefinitions="{Binding GameTableRows}"
+                    ColumnDefinitions="{Binding GameTableColumns}"
+                    ColumnSpacing="0"
+                    RowSpacing="0">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Image
+                                Margin="0"
+                                Grid.Column="{Binding X}"
+                                Grid.Row="{Binding Y}"
+                                VerticalOptions="Fill"
+                                HorizontalOptions="Fill"
+                                Source="{Binding Source}"/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </Grid>
+                <Grid
+                    AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All"
+                    BindableLayout.ItemsSource="{Binding Bombs}"
+                    RowDefinitions="{Binding GameTableRows}"
+                    ColumnDefinitions="{Binding GameTableColumns}"
+                    ColumnSpacing="0"
+                    RowSpacing="0">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Image
+                                Margin="0"
+                                Grid.Column="{Binding X}"
+                                Grid.Row="{Binding Y}"
+                                Grid.ColumnSpan="{Binding Width}"
+                                Grid.RowSpan="{Binding Height}"
+                                VerticalOptions="Fill"
+                                HorizontalOptions="Fill"
+                                Source="{Binding Source}"/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </Grid>
+            </AbsoluteLayout>
+
+            <AbsoluteLayout Grid.Row="1" Grid.Column="2">
+                <Button AbsoluteLayout.LayoutBounds="0.5, 0, 0.3, 0.3" AbsoluteLayout.LayoutFlags="All" Command="{Binding KeyPressCommand}" CommandParameter="Up"/>
+                <Button AbsoluteLayout.LayoutBounds="1, 0.5, 0.3, 0.3" AbsoluteLayout.LayoutFlags="All" Command="{Binding KeyPressCommand}" CommandParameter="Right"/>
+                <Button AbsoluteLayout.LayoutBounds="0.5, 1, 0.3, 0.3" AbsoluteLayout.LayoutFlags="All" Command="{Binding KeyPressCommand}" CommandParameter="Down"/>
+                <Button AbsoluteLayout.LayoutBounds="0, 0.5, 0.3, 0.3" AbsoluteLayout.LayoutFlags="All" Command="{Binding KeyPressCommand}" CommandParameter="Left"/>
+                <Button AbsoluteLayout.LayoutBounds="0.5, 0.5, 0.3, 0.3" AbsoluteLayout.LayoutFlags="All" Command="{Binding KeyPressCommand}" CommandParameter="Space"/>
+                <Button AbsoluteLayout.LayoutBounds="1, 0, 0.2, 0.2" AbsoluteLayout.LayoutFlags="All" Command="{Binding KeyPressCommand}" CommandParameter="Esc"/>
+            </AbsoluteLayout>
+        <HorizontalStackLayout HorizontalOptions="Start" Grid.Row="2">
+            <Label Text="Destroyed Enemies: " />
+            <Label Text="{Binding DestroyedEnemies}" />
+        </HorizontalStackLayout>
+        <HorizontalStackLayout HorizontalOptions="End" Grid.Row="2">
+            <Label Text="Game Time: " />
+            <Label Text="{Binding GameTimeString}" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>

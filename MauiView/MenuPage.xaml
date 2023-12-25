@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiView.MenuPage"
+             Title="MenuPage">
+    <AbsoluteLayout>
+        <Image AbsoluteLayout.LayoutBounds="0.5, 0.6, 0.5, 0.5" AbsoluteLayout.LayoutFlags="All" Source="{Binding MapImage}" Aspect="AspectFit"/>
+        <Button AbsoluteLayout.LayoutBounds="0.15, 0.6, 0.1, 0.5" AbsoluteLayout.LayoutFlags="All" Command="{Binding PrevMapCommand}"/>
+        <Button AbsoluteLayout.LayoutBounds="0.85, 0.6, 0.1, 0.5" AbsoluteLayout.LayoutFlags="All" Command="{Binding NextMapCommand}"/>
+        <Button AbsoluteLayout.LayoutBounds="0.5, 0.2, 0.5, 0.1" AbsoluteLayout.LayoutFlags="All" Command="{Binding StartCommand}" Text="Start Game"/>
+    </AbsoluteLayout>
+</ContentPage>
