@@ -21,7 +21,13 @@ namespace MauiView
             _game_view_model.GameOver += Game_Over;
         }
 
-        public async Task<string> ReadTextFile(string filePath)
+        protected override bool OnBackButtonPressed()
+        {
+            return true;
+            //return base.OnBackButtonPressed();
+        }
+
+        public async Task<string> ReadMapFile(string filePath)
         {
             using Stream fileStream = await FileSystem.Current.OpenAppPackageFileAsync(filePath);
             using StreamReader reader = new(fileStream);
@@ -36,7 +42,7 @@ namespace MauiView
 
             try
             {
-                mapstring = await ReadTextFile(e);
+                mapstring = await ReadMapFile(e);
                 _game_view_model.Start(mapstring);
             }
             catch (Exception ex)
@@ -53,7 +59,7 @@ namespace MauiView
 
         private async void Game_Over(object? sender, EventArgs _)
         {
-            await DisplayAlert("Game Over", String.Format("Game Over", "{0} Game Time: {1} Destroyed Enemies: {2}", _game_view_model.Player_won ? "Victory!" : "Defeat!", _game_view_model.GameTime, _game_view_model.DestroyedEnemies), "Ok");
+            await DisplayAlert("Game Over", String.Format("{0}\tGame Time: {1} s\tDestroyed Enemies: {2}", _game_view_model.Player_won ? "Victory!" : "Defeat!", _game_view_model.GameTime, _game_view_model.DestroyedEnemies), "Ok");
 
             await Navigation.PopAsync();
         }

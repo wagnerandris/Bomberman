@@ -31,21 +31,12 @@ namespace MauiView
         {
             Window window = base.CreateWindow(activationState);
 
-            // amikor az alkalmazás fókuszba kerül
-            window.Activated += (s, e) =>
-            {
-                Task.Run(() =>
-                {
-                    //TODO start timer
-                });
-            };
-
             // amikor az alkalmazás fókuszt veszt
             window.Deactivated += (s, e) =>
             {
                 Task.Run(() =>
                 {
-                    //TODO stop timer
+                    if (_GameViewModel.IsRunning) _GameViewModel.KeyDown("Space");
                 });
             };
 

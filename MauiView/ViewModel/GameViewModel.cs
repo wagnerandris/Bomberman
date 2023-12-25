@@ -17,6 +17,8 @@ namespace ViewModel
 
         public event EventHandler? GameOver;
 
+        public bool IsRunning { get; private set; } = false;
+
         private int _column_count;
         public int ColumnCount
         {
@@ -29,7 +31,7 @@ namespace ViewModel
         }
         public ColumnDefinitionCollection GameTableColumns
         {
-            get => new ColumnDefinitionCollection(Enumerable.Repeat(new ColumnDefinition(GridLength.Star), ColumnCount).ToArray());
+            get => new(Enumerable.Repeat(new ColumnDefinition(GridLength.Star), ColumnCount).ToArray());
         }
 
         private int _row_count;
@@ -45,7 +47,7 @@ namespace ViewModel
 
         public RowDefinitionCollection GameTableRows
         {
-            get => new RowDefinitionCollection(Enumerable.Repeat(new RowDefinition(GridLength.Star), RowCount).ToArray());
+            get => new(Enumerable.Repeat(new RowDefinition(GridLength.Star), RowCount).ToArray());
         }
 
         private int _game_time = 0;
@@ -71,28 +73,6 @@ namespace ViewModel
             set
             {
                 _destroyed_enemies = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _tile_width;
-        public int TileWidth
-        {
-            get => _tile_width;
-            set
-            {
-                _tile_width = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private int _tile_height;
-        public int TileHeight
-        {
-            get => _tile_height;
-            set
-            {
-                _tile_height = value;
                 OnPropertyChanged();
             }
         }
@@ -132,10 +112,6 @@ namespace ViewModel
             ColumnCount = mapReader.Map.Width;
             RowCount = mapReader.Map.Height;
 
-            TileWidth = 512 / mapReader.Map.Width;
-            TileHeight = 512 / mapReader.Map.Height;
-
-
             for (int i = 0; i < mapReader.Map.Width; i++)
             {
                 for (int j = 0; j < mapReader.Map.Height; j++)
@@ -157,6 +133,7 @@ namespace ViewModel
             // Init game
             _game = new Game(mapReader.Map, mapReader.Enemies_start, mapReader.Player_start);
             _game.TimerElapsed += Timer_Elapsed;
+            IsRunning = true;
         }
 
         private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
@@ -170,11 +147,14 @@ namespace ViewModel
             if (_game != null)
             {
                 _game.TimerElapsed -= Timer_Elapsed;
+                IsRunning = false;
             }
 
             Player_won = e.Player_won;
 
-            GameOver!.Invoke(this, EventArgs.Empty);
+            Application.Current!.Dispatcher.Dispatch(() =>
+                GameOver!.Invoke(this, EventArgs.Empty)
+            );
 
             _game = null;
         }
@@ -201,7 +181,7 @@ namespace ViewModel
 
             Application.Current!.Dispatcher.Dispatch(() =>
             {
-                Bombs.Add(new BombViewModel(pos.Item2, pos.Item1));
+                Bombs.Add(new BombViewModel(pos.Item2, pos.Item1, ColumnCount, RowCount));
             });
         }
 
@@ -250,6 +230,7 @@ namespace ViewModel
             {
                 case "Esc":
                     _game.StartPause();
+                    IsRunning = !IsRunning;
                     break;
                 case "Space":
                     _game.PlaceBomb();
